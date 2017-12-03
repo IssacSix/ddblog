@@ -12,15 +12,15 @@
         <el-form-item label="密码：" prop="password">
           <el-input v-model="loginForm.password" auto-complete="off" class="login-input"></el-input>
         </el-form-item>
+		<span class="login-fial" v-show="loginFial">用户名或者密码输入错误</span>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="loginFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogTitle.indexOf('登录') > 0 ? goSignIn() : goSignUp('loginForm') ">{{ dialogTitle.indexOf('登录') > 0 ? '登录' : '注册' }}</el-button>
+        <el-button @click="closeFormVisible()">取 消</el-button>
+        <el-button type="primary" @click="dialogTitle.indexOf('登录') > 0 ? goSignIn('loginForm') : goSignUp('loginForm') ">{{ dialogTitle.indexOf('登录') > 0 ? '登录' : '注册' }}</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
-
 <script>
 import Utils from '@/assets/utils'
 export default {
@@ -31,11 +31,15 @@ export default {
 			if (value === '') {
 				callback(new Error('请输入用户名'));
 			} else {
-				_this.isNameAPI().then(res => {
-					callback(res)
-				}).catch(res => {
-					callback(new Error('用户名已存在，请重新输入'));
-				})
+				if (_this.dialogTitle.indexOf('登录') > 0) {
+					callback();
+				} else {
+					_this.isNameAPI().then(res => {
+						callback(res)
+					}).catch(res => {
+						callback(new Error('用户名已存在，请重新输入'));
+					})
+				}
 			}
 		};
 		var validatePass = (rule, value, callback) => {
@@ -48,6 +52,7 @@ export default {
     	return {
 			isSignOut: true,
 			userName: '',
+			loginFial: false,
 			loginFormVisible: false,
         	loginForm: {
             	name: '',
@@ -70,8 +75,26 @@ export default {
     components: {
     },
 	methods: {
-		goSignIn () {
-        	this.loginFormVisible = false
+		goSignIn (formName) {
+			let _this = this
+        	this.$refs[formName].validate((valid) => {
+				if (!valid) return false
+				else {	
+					Utils.post('signIn', this.loginForm, res => {	
+						if (res === '登录失败') {
+							_this.loginFial = true
+						} else {
+							_this.isSignOut = false
+							_this.userName = res
+							// 关闭弹窗
+							_this.loginFormVisible = false
+							// 清空表单
+							_this.loginForm.name = ''
+							_this.loginForm.password = ''
+						}	
+					})
+				}
+			});
 		},
 		isNameAPI (err, cb) {
 			return new Promise((resolve, reject) => {
@@ -95,12 +118,7 @@ export default {
 					Utils.post('signUp', this.loginForm, res => {
 						_this.isSignOut = false
 						_this.userName = res
-
-						// 关闭弹窗
-						_this.loginFormVisible = false
-						// 清空表单
-						_this.loginForm.name = ''
-						_this.loginForm.password = ''
+						_this.closeFormVisible()
 					})
 				}
 			});
@@ -112,8 +130,15 @@ export default {
 			} else {
 				this.dialogTitle = "欢迎注册dingding's blog"
 			}
-		}
-		  
+		},
+		closeFormVisible () {
+			this.loginFial = false
+			// 关闭弹窗
+			this.loginFormVisible = false
+			// 清空表单
+			this.loginForm.name = ''
+			this.loginForm.password = ''
+		}  
 	}
 }
 </script>
@@ -138,6 +163,10 @@ export default {
 		}
 		.el-form-item__error {
 			left: 80px;
+		}
+		.login-fial {
+			font-size: 14px;
+			color: #fa5555;
 		}
 	}
 </style>
