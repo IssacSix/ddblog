@@ -3,6 +3,7 @@
     <el-container>
 			<el-header>
         <h1>{{ msg }}</h1>
+        <login-box></login-box>
 			</el-header>
 			<el-container>
 				<el-aside width="200px">
@@ -45,6 +46,7 @@
 </template>
 
 <script>
+import loginBox from '@/components/login'
 export default {
   name: 'app',
   data () {
@@ -60,7 +62,10 @@ export default {
       handleClose(key, keyPath) {
         console.log(key, keyPath);
       }
-    }
+  },
+  components: {
+    loginBox
+  }
 }
 </script>
 
