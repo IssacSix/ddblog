@@ -34,6 +34,11 @@ export default new Router({
       path: '/movieDetail/:id',
       name: 'movieDetail',
       component: resolve => require(['@/pages/movieDetail'], resolve)
+    },
+    {
+      path: '/setting',
+      name: 'setting',
+      component: resolve => require(['@/pages/setting'], resolve)
     }
   ]
 })

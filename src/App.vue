@@ -31,9 +31,9 @@
                   <el-menu-item index="1-2-2" route="adminList">Admin List</el-menu-item>
               </el-submenu>
             </el-submenu>
-            <el-menu-item index="3">
+            <el-menu-item index="setting">
               <i class="el-icon-setting"></i>
-              <span slot="title">设置</span>
+              <span slot="title" route="setting">设置</span>
             </el-menu-item>
           </el-menu>
         </el-aside>
