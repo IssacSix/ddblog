@@ -49,7 +49,7 @@ export default {
 				callback();
 			}
 		};
-    	return {
+    return {
 			isSignOut: true,
 			userName: '',
 			loginFial: false,
@@ -67,20 +67,32 @@ export default {
 					{ validator: validateName, trigger: 'blur' }
 				],
 			}
-    	}
+    }
 	},
 	created () {
 		this.isLogin()
 	},
-	mounted () {
+	watch: {
+		is_login (old) {
+			if (!old) this.hideUserName()
+		}
 	},
-    components: {
-    },
+	computed: {
+		is_login () {
+			return this.$store.state.is_login
+		}
+	},
+	mounted () {
+		
+	},
+	components: {
+  },
 	methods: {
 		isLogin () {
 			let _this = this
 			Utils.post('isLogin', '' ,res => {
 				_this.showUerName(res)
+				_this.$store.commit('login')
 			}, res => {
 				console.log(res)
 			})
@@ -94,6 +106,7 @@ export default {
 						if (res === '登录失败') {
 							_this.loginFial = true
 						} else {
+							_this.$store.commit('login')
 							_this.showUerName(res)
 						}	
 					}, res => {
@@ -106,6 +119,10 @@ export default {
 			this.isSignOut = false
 			this.userName = name
 			this.closeFormVisible()
+		},
+		hideUserName () {
+			this.isSignOut = true
+			this.userName = ''
 		},
 		isNameAPI (err, cb) {
 			return new Promise((resolve, reject) => {

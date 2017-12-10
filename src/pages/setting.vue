@@ -2,14 +2,13 @@
   <div class="setting-box">
 		<el-form ref="form" :model="settingForm" label-width="100px" label-position="left">
   		<el-form-item label="登录状态">
-				
+				<el-button tyep="primery" @click="logout()">退出登录</el-button>
 			</el-form-item>
 		</el-form>
   </div>
 </template>
 
 <script>
-import axios from "axios";
 import Utils from '@/assets/utils'
 export default {
   name: 'setting',
@@ -19,20 +18,29 @@ export default {
 	
 			}
 		}
-  },
+	},
+	computed: {
+		is_login () {
+			// conole.log('setting login status: ' + this.$store.is_login)
+		}
+	},
 	created () {
 		
 	},
 	components: {
 	},
 	methods: {
-		errMsgOpen(msg) {
-			const h = this.$createElement;
-			this.$notify({
-				title: '服务端错误',
-				message: h('i', { style: 'color: teal'}, '好像是接口报错了呢！')
-			});
-    }
+		logout () {
+			let _this = this
+			Utils.post('logout', '' , res => {
+				if (res === '退出登录') {
+					_this.$router.push({path: '/'})
+					_this.$store.commit('logout')
+				}
+			}, res => {
+				console.log(res)
+			})
+		}
 	}
 }
 </script>
